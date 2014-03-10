@@ -134,7 +134,7 @@
        * Toggle the input box active.
        */
       $scope.selectArea = function selectArea() {
-        $scope.toggles.inputActive = true;
+        $scope.$broadcast('inputActive');
       };
 
       /**
@@ -256,9 +256,7 @@
            element.bind('blur', function () {
              $timeout(function () {
                cancel();
-               scope.toggles.inputActive =
-                 false;
-             });
+             }, 100);
            });
 
            /**
@@ -313,13 +311,11 @@
             * When inputActive toggle changes to true, focus the input.
             * And no I have no idea why this has to be in a timeout.
             */
-           scope.$watch('toggles.inputActive',
+           scope.$on('inputActive',
              function (newVal) {
-               if (newVal) {
-                 $timeout(function () {
-                   element[0].focus();
-                 });
-               }
+               $timeout(function () {
+                 element[0].focus();
+               });
              });
 
            /**
@@ -482,7 +478,10 @@
                if (angular.isUndefined(value)) {
                  return;
                }
-               if (angular.isString(value) && value !== '') {
+               else if (angular.isString(value) && value === '') {
+                 return arr;
+               }
+               else if (angular.isString(value)) {
                  arr = value
                    .split(scope.options.delimiter)
                    .map(function (item) {
@@ -571,9 +570,7 @@
 
            // this should be named something else since it's just a collection
            // of random shit.
-           scope.toggles = {
-             inputActive: false
-           };
+           scope.toggles = {};
 
            /**
             * When we receive this event, sort.
